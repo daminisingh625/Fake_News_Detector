@@ -1,42 +1,15 @@
-import os
-import cohere
-from dotenv import load_dotenv
-import json
-from phi.model.cohere import CohereChat
-from langchain_cohere import ChatCohere
+from flask import Flask, render_template, request
+from detector import detect_fake_news
 
-load_dotenv()
+app = Flask(__name__)
 
-###################
-from phi.agent import Agent
-from phi.tools.googlesearch import GoogleSearch
-cohere_api_key = os.getenv("COHERE_API_KEY")
+@app.route("/", methods=["GET", "POST"])
+def index():
+    result = ""
+    if request.method == "POST":
+        news_input = request.form["news"]
+        result = detect_fake_news(news_input)
+    return render_template("index.html", result=result)
 
-chat = ChatCohere(cohere_api_key=cohere_api_key)
-
-chat_agent = CohereChat(api_key=cohere_api_key)
-
-
-agent = Agent(
-    provider=chat_agent,
-    tools=[GoogleSearch()],
-    description="You are a news agent that helps users analyse if the given news is fake or real by searching the web..",
-    instructions=[
-        "Given a topic by the user, respond with 4 relevant news items about that topic.",
-        "Search for 10 news items and select the top 4 unique items.",
-        "Search in English and Hindi.",
-    ],
-    show_tool_calls=True,
-    debug_mode=True,
-)
-
-news = "RCB wins IPL"
-context = agent.run(news).content
-
-print(context)
-template = f'''
-        You are a fake news detector, Given the following news = {news} and the content = {context}
-        Your job is to tell if the news is fake or real based on the given content
-    '''
-
-chat.invoke(template).content
+if __name__ == "__main__":
+    app.run(debug=True)

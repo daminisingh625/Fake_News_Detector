@@ -1,0 +1,55 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Don't Fake</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+    <div class="navbar-brand">📰 Don't Fake</div>
+    <ul class="navbar-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Verify</a></li>
+        <li><a href="#">About</a></li>
+    </ul>
+</nav>
+
+  <div class="container">
+    <div class="heading">
+      <h1>Don't fake it, You won't make it!</h1>
+    </div>
+
+    <!-- News Form -->
+    <form method="POST" class="form">
+      <input type="text" name="news" placeholder="Enter your news headline here" required />
+      <button type="submit">Verify News</button>
+    </form>
+
+    {% if result %}
+<div class="result-card">
+    <h2><span class="news-title">"{{ user_news }}"</span></h2>
+    <div class="verdict">
+        <strong>Verdict:</strong>
+        {% if "fake" in result.lower() %}
+            <span class="badge fake">FAKE</span>
+        {% elif "real" in result.lower() %}
+            <span class="badge real">REAL</span>
+        {% else %}
+            <span class="badge unknown">UNKNOWN</span>
+        {% endif %}
+    </div>
+    <div class="reasoning">
+        <strong>Reasoning:</strong>
+        <p>{{ result }}</p>
+    </div>
+</div>
+{% endif %}
+
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
